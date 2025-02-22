@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Men's Collection - Trendy Treads</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">Trendy Treads</a>
+            <div class="nav-links">
+                <a href="/mens.html" class="nav-link">Men</a>
+                <a href="/womens.html" class="nav-link">Women</a>
+                <a href="/new-arrivals.html" class="nav-link">New Arrivals</a>
+                <a href="/sales.html" class="nav-link">Sale</a>
+            </div>
+            <div class="nav-icons">
+                <a href="/auth.html" class="nav-link" id="authLink">Sign In</a>
+                <a href="/profile.html" class="nav-link" id="profileLink" style="display: none;">Profile</a>
+                <button class="icon-btn" id="cartBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 20a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-7-3h7a1 1 0 0 0 .962-.725l3-10A1 1 0 0 0 19 5H5.721L4.429 2H1m1 3h17l-3 10H6L3 3"></path>
+                    </svg>
+                    <span id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="featured-products" style="margin-top: 100px;">
+        <div class="section-header">
+            <h2>Men's Collection</h2>
+            <p>Discover our latest men's fashion</p>
+        </div>
+        <div class="product-grid">
+            <div class="product-card fade-in">
+                <img src="https://images.unsplash.com/photo-1581092795360-fd1ca04f0952" alt="Men's Fashion" class="product-image">
+                <div class="product-info">
+                    <h3>Classic Checkered Shirt</h3>
+                    <p>$59.99</p>
+                    <button class="btn-primary add-to-cart" data-id="m1" data-name="Classic Checkered Shirt" data-price="59.99">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card fade-in">
+                <img src="https://images.unsplash.com/photo-1617137984095-74e4e5e3613f" alt="Men's Fashion" class="product-image">
+                <div class="product-info">
+                    <h3>Casual Denim Jacket</h3>
+                    <p>$89.99</p>
+                    <button class="btn-primary add-to-cart" data-id="m2" data-name="Casual Denim Jacket" data-price="89.99">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card fade-in">
+                <img src="https://images.unsplash.com/photo-1516257984-b1b4d707412e" alt="Men's Fashion" class="product-image">
+                <div class="product-info">
+                    <h3>Urban Sneakers</h3>
+                    <p>$79.99</p>
+                    <button class="btn-primary add-to-cart" data-id="m3" data-name="Urban Sneakers" data-price="79.99">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
