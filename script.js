@@ -1,103 +1,147 @@
 
-// Product data
-const products = [
-    {
-        id: 1,
-        name: "Classic Runner",
-        price: 129,
-        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff"
-    },
-    {
-        id: 2,
-        name: "Urban Street",
-        price: 149,
-        image: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2"
-    },
-    {
-        id: 3,
-        name: "Sport Elite",
-        price: 189,
-        image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86"
+// Cart functionality
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let cartTotal = 0;
+
+function updateCartCount() {
+    const cartCount = document.getElementById('cartCount');
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.textContent = totalItems.toString();
+}
+
+function updateCartTotal() {
+    cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const cartTotalElement = document.querySelector('.cart-total');
+    if (cartTotalElement) {
+        cartTotalElement.textContent = `Total: $${cartTotal.toFixed(2)}`;
     }
-];
+}
 
-// Mobile menu functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const menuBtn = document.getElementById('menuBtn');
-    const navLinks = document.getElementById('navLinks');
+function saveCart() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    updateCartTotal();
+}
+
+function addToCart(id, name, price) {
+    const existingItem = cart.find(item => item.id === id);
     
-    menuBtn.addEventListener('click', function() {
-        navLinks.classList.toggle('active');
-        const spans = menuBtn.getElementsByTagName('span');
-        spans[0].style.transform = navLinks.classList.contains('active') ? 'rotate(45deg) translate(6px, 6px)' : '';
-        spans[1].style.opacity = navLinks.classList.contains('active') ? '0' : '1';
-        spans[2].style.transform = navLinks.classList.contains('active') ? 'rotate(-45deg) translate(6px, -6px)' : '';
-    });
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({
+            id,
+            name,
+            price: parseFloat(price),
+            quantity: 1
+        });
+    }
+    
+    saveCart();
+    showCart();
+}
 
-    // Render products
-    const productGrid = document.getElementById('productGrid');
-    products.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        productCard.innerHTML = `
-            <img src="${product.image}" alt="${product.name}" class="product-image">
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>$${product.price}</p>
+function removeFromCart(id) {
+    cart = cart.filter(item => item.id !== id);
+    saveCart();
+    renderCart();
+}
+
+function updateQuantity(id, change) {
+    const item = cart.find(item => item.id === id);
+    if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+            removeFromCart(id);
+        } else {
+            saveCart();
+            renderCart();
+        }
+    }
+}
+
+function renderCart() {
+    const cartContent = document.querySelector('.cart-items');
+    if (!cartContent) return;
+
+    cartContent.innerHTML = '';
+    
+    cart.forEach(item => {
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+            <div class="cart-item-info">
+                <div class="cart-item-title">${item.name}</div>
+                <div class="cart-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+                <div class="cart-item-quantity">
+                    <button class="quantity-btn" onclick="updateQuantity('${item.id}', -1)">-</button>
+                    <span>${item.quantity}</span>
+                    <button class="quantity-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
+                </div>
             </div>
+            <button class="remove-item" onclick="removeFromCart('${item.id}')">×</button>
         `;
-        productGrid.appendChild(productCard);
+        cartContent.appendChild(cartItem);
     });
+    
+    updateCartTotal();
+}
 
-    // Simple cart functionality
+function showCart() {
+    const cartPopup = document.querySelector('.cart-popup');
+    const cartOverlay = document.querySelector('.cart-overlay');
+    if (cartPopup && cartOverlay) {
+        cartPopup.classList.add('active');
+        cartOverlay.classList.add('active');
+        renderCart();
+    }
+}
+
+function hideCart() {
+    const cartPopup = document.querySelector('.cart-popup');
+    const cartOverlay = document.querySelector('.cart-overlay');
+    if (cartPopup && cartOverlay) {
+        cartPopup.classList.remove('active');
+        cartOverlay.classList.remove('active');
+    }
+}
+
+// Initialize cart functionality
+document.addEventListener('DOMContentLoaded', () => {
+    // Add cart popup HTML to the body
+    const cartHTML = `
+        <div class="cart-overlay"></div>
+        <div class="cart-popup">
+            <div class="cart-header">
+                <h3>Shopping Cart</h3>
+                <button class="cart-close" onclick="hideCart()">×</button>
+            </div>
+            <div class="cart-items"></div>
+            <div class="cart-total">Total: $0.00</div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', cartHTML);
+
+    // Setup event listeners
     const cartBtn = document.getElementById('cartBtn');
-    let cartItems = [];
+    const cartOverlay = document.querySelector('.cart-overlay');
+    
+    if (cartBtn) {
+        cartBtn.addEventListener('click', showCart);
+    }
+    
+    if (cartOverlay) {
+        cartOverlay.addEventListener('click', hideCart);
+    }
 
-    // Add click event listeners to product cards
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const productName = this.querySelector('h3').textContent;
-            const productPrice = parseFloat(this.querySelector('p').textContent.replace('$', ''));
-            cartItems.push({ name: productName, price: productPrice });
-            alert(`${productName} added to cart!`);
-            updateCartCount();
+    // Setup add to cart buttons
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const { id, name, price } = e.target.dataset;
+            addToCart(id, name, price);
         });
     });
 
-    function updateCartCount() {
-        cartBtn.setAttribute('data-count', cartItems.length);
-        if (cartItems.length > 0) {
-            cartBtn.style.position = 'relative';
-            if (!cartBtn.querySelector('.cart-count')) {
-                const count = document.createElement('span');
-                count.className = 'cart-count';
-                count.style.cssText = `
-                    position: absolute;
-                    top: -8px;
-                    right: -8px;
-                    background-color: red;
-                    color: white;
-                    border-radius: 50%;
-                    padding: 2px 6px;
-                    font-size: 12px;
-                `;
-                count.textContent = cartItems.length;
-                cartBtn.appendChild(count);
-            } else {
-                cartBtn.querySelector('.cart-count').textContent = cartItems.length;
-            }
-        }
-    }
-
-    // Newsletter form
-    const newsletterForm = document.querySelector('.newsletter-form');
-    newsletterForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = this.querySelector('input[type="email"]').value;
-        if (email) {
-            alert('Thank you for subscribing!');
-            this.querySelector('input[type="email"]').value = '';
-        }
-    });
+    // Initialize cart count
+    updateCartCount();
 });
-
